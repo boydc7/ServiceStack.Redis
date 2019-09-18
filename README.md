@@ -1,5 +1,4 @@
-Follow [@ServiceStack](https://twitter.com/servicestack) or join the [Google+ Community](https://plus.google.com/communities/112445368900682590445)
-for updates, or [StackOverflow](http://stackoverflow.com/questions/ask) or the [Customer Forums](https://forums.servicestack.net/) for support.
+Follow [@ServiceStack](https://twitter.com/servicestack) or [view the docs](https://docs.servicestack.net), use [StackOverflow](http://stackoverflow.com/questions/ask) or the [Customer Forums](https://forums.servicestack.net/) for support.
 
 # C#/.NET Client for Redis
 
@@ -158,7 +157,7 @@ The `PooledRedisClientManager` imposes a maximum connection limit and when its m
 
 ### BasicRedisClientManager
 
-If don't want to use connection pooling (i.e. your accessing a local redis-server instance) you can use a basic (non-pooled) Clients Manager which creates a new `RedisClient` instance each time:
+If don't want to use connection pooling (i.e. you're accessing a local redis-server instance) you can use a basic (non-pooled) Clients Manager which creates a new `RedisClient` instance each time:
 
 ```csharp
 container.Register<IRedisClientsManager>(c => 
