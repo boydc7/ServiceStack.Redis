@@ -24,11 +24,11 @@ With each client providing different layers of abstraction:
   
   * The RedisNativeClient exposes raw `byte[]` apis and does no marshalling and passes all values directly to redis.
   * The RedisClient assumes `string` values and simply converts strings to UTF8 bytes before sending to Redis
-  * The RedisTypedClient provides a generic interface allowing you to add POCO values. The POCO types are serialized using [.NETs fastest JSON Serializer](http://www.servicestack.net/mythz_blog/?p=344) which is then converted to UTF8 bytes and sent to Redis.
+  * The RedisTypedClient provides a generic interface allowing you to add POCO values. The POCO types are serialized using [.NETs fastest JSON Serializer](https://github.com/ServiceStackV3/mythz_blog/blob/master/pages/344.md) which is then converted to UTF8 bytes and sent to Redis.
 
 ### API Overview
 
-[![Redis Client API](http://mono.servicestack.net/img/Redis-annotated-preview.png)](http://mono.servicestack.net/img/Redis-annotated.png)
+[![Redis Client API](https://servicestack.net/img/redis-annotated-preview.png)](https://servicestack.net/img/redis-annotated.png)
 
 ## Redis Connection Strings
 
@@ -295,10 +295,23 @@ RedisConfig.BackOffMultiplier = 10;
 
 ## [ServiceStack.Redis SSL Support](http://docs.servicestack.net/ssl-redis-azure)
 
-ServiceStack.Redis now supporting **SSL connections** making it suitable for accessing remote Redis server instances over a 
+ServiceStack.Redis supports **SSL connections** making it suitable for accessing remote Redis server instances over a 
 **secure SSL connection**.
 
 ![Azure Redis Cache](https://github.com/ServiceStack/Assets/raw/master/img/wikis/redis/azure-redis-instance.png)
+
+#### Specify SSL Protocol
+
+Support for changing the Ssl Protocols used for encrypted SSL connections can be set on the connection string using the `sslprotocols` modifier, e.g:
+
+```csharp
+var connString = $"redis://{Host}?ssl=true&sslprotocols=Tls12&password={Password.UrlEncode()}";
+var redisManager = new RedisManagerPool(connString);
+using (var client = redisManager.GetClient())
+{
+    //...
+}
+```
 
 ### [Connecting to Azure Redis](http://docs.servicestack.net/ssl-redis-azure)
 
@@ -782,6 +795,16 @@ RedisConfig.AssertAccessOnlyOnSameThread = true;
 This captures the Thread's StackTrace each time the client is resolved from the pool which as it adds a lot of overhead, should only be enabled when debugging connection issues. 
 
 If it does detect the client is being accessed from a different thread it will throw a `InvalidAccessException` with the message containing the different **Thread Ids** and the **original StackTrace** where the client was resolved from the pool. You can compare this with the StackTrace of the Exception to hopefully identify where the client is being improperly used.
+
+#### Avoiding Concurrent Usage issues
+
+What to look out for in your code-base to prevent against multiple concurrent usage of a `IRedisClient` instance:
+
+ - Use `IRedisClient` redis instance client within a `using` statement
+ - Never use a client instance after it has been disposed
+ - Never use (or return) a "server collection" (e.g. [Redis.Lists](#simple-example-using-redis-lists)) after the client has been disposed
+ - Never keep a Singleton or `static` instance to a redis client (just the `IRedisClientsManager` factory)
+ - Never use the same redis client in multiple threads, i.e. have each thread resolve their own client from the factory
 
 ## Copying
 

@@ -92,17 +92,6 @@ namespace ServiceStack.Redis
             };
             try
             {
-#if NETSTANDARD2_1
-                if (IPAddress.TryParse(Host, out var ip))
-                {
-                    socket.Connect(ip, Port);
-                }
-                else
-                {
-                    var addresses = Dns.GetHostAddressesAsync(Host).Result;
-                    socket.Connect(addresses.FirstOrDefault(a => a.AddressFamily == AddressFamily.InterNetwork), Port);
-                }
-#else
                 if (ConnectTimeout <= 0)
                 {
                     socket.Connect(Host, Port);
@@ -114,7 +103,6 @@ namespace ServiceStack.Redis
                         : socket.BeginConnect(Host, Port, null, null);
                     connectResult.AsyncWaitHandle.WaitOne(ConnectTimeout, true);
                 }
-#endif
 
                 if (!socket.Connected)
                 {
@@ -144,7 +132,7 @@ namespace ServiceStack.Redis
                     }
                     else
                     {
-#if NETSTANDARD2_1
+#if NETSTANDARD2_0
                         sslStream = new SslStream(networkStream,
                             leaveInnerStreamOpen: false,
                             userCertificateValidationCallback: RedisConfig.CertificateValidationCallback,
@@ -167,7 +155,7 @@ namespace ServiceStack.Redis
 #endif                        
                     }
 
-#if NETSTANDARD2_1
+#if NETSTANDARD2_0
                     sslStream.AuthenticateAsClientAsync(Host).Wait();
 #else
                     if (SslProtocols != null)
