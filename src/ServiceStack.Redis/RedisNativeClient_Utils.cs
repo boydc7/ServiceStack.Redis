@@ -132,7 +132,7 @@ namespace ServiceStack.Redis
                     }
                     else
                     {
-#if NETSTANDARD2_0
+#if NETSTANDARD2_1
                         sslStream = new SslStream(networkStream,
                             leaveInnerStreamOpen: false,
                             userCertificateValidationCallback: RedisConfig.CertificateValidationCallback,
@@ -155,7 +155,7 @@ namespace ServiceStack.Redis
 #endif                        
                     }
 
-#if NETSTANDARD2_0
+#if NETSTANDARD2_1
                     sslStream.AuthenticateAsClientAsync(Host).Wait();
 #else
                     if (SslProtocols != null)
